@@ -14,7 +14,7 @@ from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
 CreatorPlatformId = Literal[
-    "instagram", "youtube", "tiktok", "facebook", "x", "onlyfans", "patreon"
+    "instagram", "youtube", "tiktok", "facebook", "x", "pinterest", "onlyfans", "patreon"
 ]
 
 Niche = Literal["dance", "fashion"]

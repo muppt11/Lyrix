@@ -13,6 +13,7 @@ on (platform, id).
 from __future__ import annotations
 
 import argparse
+import hashlib
 import sys
 import time
 from datetime import datetime, timezone
@@ -31,11 +32,11 @@ NICHE_KEYWORDS: dict[str, list[str]] = {
 }
 
 
-def backfill(niches: list[str], since_year: int, until_year: int, max_results: int = 50) -> None:
+def backfill(niches: list[str], since_year: int, until_year: int, max_results: int = 50) -> int:
     connector = YouTubeConnector()
     if not connector.api_key:
         print("YOUTUBE_API_KEY not set — nothing to backfill.", file=sys.stderr)
-        return
+        return 0
 
     total_items = 0
     for niche in niches:
@@ -49,16 +50,25 @@ def backfill(niches: list[str], since_year: int, until_year: int, max_results: i
                     print(f"[{niche}/{keyword}/{year}] {status.status}: {status.detail}")
                     if status.status == "degraded" and status.detail and "quota" in status.detail:
                         print("Daily quota budget exhausted — stopping early. Re-run tomorrow to continue.")
-                        return
+                        return total_items
                     continue
 
-                append_content_items(items, niche, keyword, ingestion_mode="backfill", era_year=year)
+                batch_key = hashlib.sha256(f"{niche}\0{keyword}\0{year}".encode()).hexdigest()[:20]
+                append_content_items(
+                    items,
+                    niche,
+                    keyword,
+                    ingestion_mode="backfill",
+                    era_year=year,
+                    ingestion_id=f"youtube-backfill-{niche}-{year}-{batch_key}",
+                )
                 total_items += len(items)
                 print(f"[{niche}/{keyword}/{year}] {len(items)} videos")
                 time.sleep(0.2)  # be a polite API citizen
 
     print(f"Backfill complete: {total_items} items persisted across {len(niches)} niche(s), "
           f"{since_year}-{until_year}.")
+    return total_items
 
 
 def main() -> None:

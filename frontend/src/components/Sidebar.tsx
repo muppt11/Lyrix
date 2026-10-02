@@ -3,35 +3,33 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
+  FileText,
+  Image,
   LayoutDashboard,
-  LineChart,
-  Share2,
   ListTodo,
+  TrendingUp,
   Users,
-  Zap,
-  Search,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PixelMark } from '@/components/PixelMark';
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Neural Core', icon: LayoutDashboard },
-  { href: '/discover', label: 'Discover', icon: Search },
-  { href: '/ecommerce', label: 'Commerce Matrix', icon: LineChart },
-  { href: '/social', label: 'Social Grid', icon: Share2 },
-  { href: '/creator-platform', label: 'Creator Platform', icon: Users },
-  { href: '/tasks', label: 'Task Protocol', icon: ListTodo },
+  { href: '/overview', label: 'Overview', icon: LayoutDashboard },
+  { href: '/tasks', label: 'Project', icon: ListTodo },
+  { href: '/documents', label: 'Documents', icon: FileText },
+  { href: '/social', label: 'Progress', icon: TrendingUp },
+  { href: '/discover', label: 'Assets', icon: Image },
+  { href: '/creator-platform', label: 'Apps', icon: Users },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex md:w-64 flex-col border-r border-neon-cyan/15 p-6 glass-panel m-4 rounded-2xl">
+    <aside className="hidden md:flex md:w-56 flex-col border-r border-gray-200 bg-white p-4">
       <div className="flex items-center gap-2 mb-10">
-        <Zap className="text-neon-cyan" />
-        <span className="font-orbitron text-lg tracking-widest text-neon-cyan text-shadow-glow">
-          LYRALYTICS
-        </span>
+        <PixelMark />
+        <span className="lyrix-brand-word">LYRIX</span>
       </div>
       <nav className="flex flex-col gap-2">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
@@ -41,10 +39,10 @@ export function Sidebar() {
               key={href}
               href={href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+                'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
                 active
-                  ? 'bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30'
-                  : 'text-gray-400 hover:text-neon-cyan hover:bg-neon-cyan/5'
+                  ? 'bg-sky-50 text-sky-800 border border-sky-200'
+                  : 'text-gray-600 hover:bg-sky-50 hover:text-sky-800'
               )}
             >
               <Icon size={18} />

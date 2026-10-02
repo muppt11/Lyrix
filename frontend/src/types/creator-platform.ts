@@ -19,6 +19,7 @@ export type CreatorPlatformId =
   | 'tiktok'
   | 'facebook'
   | 'x'
+  | 'pinterest'
   | 'onlyfans'
   | 'patreon';
 

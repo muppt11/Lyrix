@@ -125,7 +125,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -146,6 +146,7 @@ venv.bak/
 api/.venv/
 
 # Data lake (generated, not committed)
+data/raw/
 data/raw/
 data/processed/
 

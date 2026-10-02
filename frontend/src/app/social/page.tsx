@@ -27,7 +27,7 @@ export default function SocialPage() {
   return (
     <div className="flex flex-col gap-8 animate-fade-in">
       <header>
-        <h1 className="font-orbitron text-3xl text-neon-cyan text-shadow-glow">Social Grid Monitor</h1>
+        <h1 className="font-orbitron text-3xl text-neon-cyan">Progress</h1>
         <p className="text-gray-400 mt-1">
           Cross-platform engagement across Instagram, Facebook, YouTube, TikTok, and X (demo data).
         </p>

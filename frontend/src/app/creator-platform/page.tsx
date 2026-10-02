@@ -59,7 +59,7 @@ export default function CreatorPlatformPage() {
   return (
     <div className="flex flex-col gap-8 animate-fade-in">
       <header>
-        <h1 className="font-orbitron text-3xl text-neon-cyan text-shadow-glow">Creator Platform</h1>
+        <h1 className="font-orbitron text-3xl text-neon-cyan">Apps</h1>
         <p className="text-gray-400 mt-1">
           One dashboard for every channel — Instagram, YouTube, TikTok, Facebook, X, OnlyFans, Patreon, and more.
         </p>
@@ -158,19 +158,19 @@ export default function CreatorPlatformPage() {
             <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#00ffff" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="#00ffff" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#55a8d0" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#55a8d0" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="date" stroke="#6b7280" fontSize={11} />
               <YAxis stroke="#6b7280" fontSize={11} tickFormatter={(v) => formatCompactNumber(v)} />
               <Tooltip
-                contentStyle={{ background: '#0a0f19', border: '1px solid rgba(0,255,255,0.2)', borderRadius: 8 }}
-                labelStyle={{ color: '#00ffff' }}
+                contentStyle={{ background: '#fff', border: '1px solid #e8e8ed', borderRadius: 6, color: '#20202a' }}
+                labelStyle={{ color: '#287fa8' }}
                 formatter={(value: number) => formatCompactNumber(value)}
               />
-              <Area type="monotone" dataKey="views" stroke="#00ffff" fill="url(#viewsGradient)" strokeWidth={2} />
+              <Area type="monotone" dataKey="views" stroke="#55a8d0" fill="url(#viewsGradient)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </Panel>
@@ -184,11 +184,11 @@ export default function CreatorPlatformPage() {
                 <XAxis dataKey="label" stroke="#6b7280" fontSize={11} />
                 <YAxis stroke="#6b7280" fontSize={11} tickFormatter={(v) => formatCurrencyFromCents(v)} />
                 <Tooltip
-                  contentStyle={{ background: '#0a0f19', border: '1px solid rgba(0,255,255,0.2)', borderRadius: 8 }}
-                  labelStyle={{ color: '#00ffff' }}
+                  contentStyle={{ background: '#fff', border: '1px solid #e8e8ed', borderRadius: 6, color: '#20202a' }}
+                  labelStyle={{ color: '#287fa8' }}
                   formatter={(value: number) => formatCurrencyFromCents(value)}
                 />
-                <Bar dataKey="amountCents" fill="#8000ff" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="amountCents" fill="#78bddb" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (

@@ -6,6 +6,7 @@ import {
   Twitter,
   Heart,
   Gift,
+  Image,
   type LucideIcon,
 } from 'lucide-react';
 import type { CreatorPlatformId } from '@/types/creator-platform';
@@ -16,6 +17,7 @@ export const PLATFORM_ICONS: Record<CreatorPlatformId, LucideIcon> = {
   youtube: Youtube,
   tiktok: Music2,
   x: Twitter,
+  pinterest: Image,
   onlyfans: Heart,
   patreon: Gift,
 };

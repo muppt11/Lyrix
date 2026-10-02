@@ -26,11 +26,11 @@ const revenueSeries = seriesDates.map((date, i) => ({
 }));
 
 const topProducts = [
-  { name: 'Cyber Hoodie', units: 482, revenueCents: 1928000 },
-  { name: 'Neon Sneakers', units: 311, revenueCents: 2487900 },
-  { name: 'Holo Backpack', units: 256, revenueCents: 1535900 },
-  { name: 'Data Glasses', units: 198, revenueCents: 3563820 },
-  { name: 'Pulse Watch', units: 142, revenueCents: 2129580 },
+  { name: 'Basic Hoodie', units: 482, revenueCents: 1928000 },
+  { name: 'Classic Sneakers', units: 311, revenueCents: 2487900 },
+  { name: 'Daypack', units: 256, revenueCents: 1535900 },
+  { name: 'Reading Glasses', units: 198, revenueCents: 3563820 },
+  { name: 'Fitness Watch', units: 142, revenueCents: 2129580 },
 ];
 
 export default function EcommercePage() {
@@ -40,7 +40,7 @@ export default function EcommercePage() {
   return (
     <div className="flex flex-col gap-8 animate-fade-in">
       <header>
-        <h1 className="font-orbitron text-3xl text-neon-cyan text-shadow-glow">Commerce Matrix</h1>
+        <h1 className="font-orbitron text-3xl text-neon-cyan">Commerce</h1>
         <p className="text-gray-400 mt-1">Sales performance and product analytics (demo data).</p>
       </header>
 
@@ -59,10 +59,10 @@ export default function EcommercePage() {
             <XAxis dataKey="date" stroke="#6b7280" fontSize={11} />
             <YAxis stroke="#6b7280" fontSize={11} tickFormatter={(v) => `$${v}`} />
             <Tooltip
-              contentStyle={{ background: '#0a0f19', border: '1px solid rgba(0,255,255,0.2)', borderRadius: 8 }}
-              labelStyle={{ color: '#00ffff' }}
+              contentStyle={{ background: '#fff', border: '1px solid #e8e8ed', borderRadius: 6, color: '#20202a' }}
+              labelStyle={{ color: '#287fa8' }}
             />
-            <Line type="monotone" dataKey="revenue" stroke="#00ffff" strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="revenue" stroke="#55a8d0" strokeWidth={2} dot={false} />
           </LineChart>
         </ResponsiveContainer>
       </Panel>

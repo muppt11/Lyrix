@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ResponsiveContainer,
@@ -23,18 +23,24 @@ import {
   Heart,
   MessageCircle,
   ExternalLink,
-  Sparkles,
-  Flame,
   Youtube,
   Loader2,
   TrendingUp,
   Layers,
   AlertCircle,
+  Info,
+  Check,
+  Film,
+  Image as ImageIcon,
+  ImagePlus,
+  Trash2,
 } from 'lucide-react';
 
+type PictureAsset = { id: string; name: string; url: string };
+
 const NICHES: { id: Niche; label: string; accent: string }[] = [
-  { id: 'dance', label: 'Dance', accent: '#00ffff' },
-  { id: 'fashion', label: 'Fashion', accent: '#ff0080' },
+  { id: 'dance', label: 'Dance', accent: '#58a8d4' },
+  { id: 'fashion', label: 'Fashion', accent: '#b36b73' },
 ];
 
 const EXAMPLE_QUERIES: Record<Niche, string[]> = {
@@ -53,6 +59,39 @@ export default function DiscoverPage() {
   const [result, setResult] = useState<DiscoverResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'pictures' | 'youtube'>('pictures');
+  const [pictures, setPictures] = useState<PictureAsset[]>([]);
+  const [selectedPictureIds, setSelectedPictureIds] = useState<Set<string>>(new Set());
+  const [selectedVideoIds, setSelectedVideoIds] = useState<Set<string>>(new Set());
+  const pictureUrls = useRef<string[]>([]);
+
+  useEffect(
+    () => () => pictureUrls.current.forEach((url) => URL.revokeObjectURL(url)),
+    []
+  );
+
+  function addPictures(files: FileList | null) {
+    if (!files) return;
+    const added = Array.from(files)
+      .filter((file) => file.type.startsWith('image/'))
+      .map((file) => {
+        const url = URL.createObjectURL(file);
+        pictureUrls.current.push(url);
+        return { id: url, name: file.name, url };
+      });
+    setPictures((current) => [...current, ...added]);
+  }
+
+  function removePicture(picture: PictureAsset) {
+    URL.revokeObjectURL(picture.url);
+    pictureUrls.current = pictureUrls.current.filter((url) => url !== picture.url);
+    setPictures((current) => current.filter((item) => item.id !== picture.id));
+    setSelectedPictureIds((current) => {
+      const next = new Set(current);
+      next.delete(picture.id);
+      return next;
+    });
+  }
 
   async function runSearch(q: string) {
     const trimmed = q.trim();
@@ -92,30 +131,112 @@ export default function DiscoverPage() {
     return { totalViews, peakVelocity, avgEngagement, count: result.items.length };
   }, [result]);
 
-  const activeAccent = NICHES.find((n) => n.id === niche)?.accent ?? '#00ffff';
-
   return (
-    <div className="flex flex-col gap-8 animate-fade-in">
+    <div className="discover-workspace flex flex-col gap-6 animate-fade-in">
       <header className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-orbitron text-3xl text-neon-cyan text-shadow-glow flex items-center gap-3">
-            <Sparkles className="text-neon-purple" />
-            Discover
-          </h1>
-          <p className="text-gray-400 mt-1 max-w-xl">
-            Search a niche keyword to see what&apos;s trending right now, ranked by real view velocity
-            — not just total views.
+          <h1 className="discover-title">Assets</h1>
+          <p className="discover-lede mt-2 max-w-xl text-sm">
+            Curate pictures and find YouTube videos for your workspace.
           </p>
         </div>
       </header>
 
-      <Panel className="relative overflow-hidden">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-20 transition-colors duration-500"
-          style={{
-            background: `radial-gradient(circle at 15% 0%, ${activeAccent}33 0%, transparent 60%)`,
-          }}
-        />
+      <div className="discover-tabs" role="tablist" aria-label="Media type">
+        {[
+          { id: 'pictures' as const, label: 'Pictures', icon: ImageIcon, count: selectedPictureIds.size },
+          { id: 'youtube' as const, label: 'YouTube videos', icon: Film, count: selectedVideoIds.size },
+        ].map(({ id, label, icon: Icon, count }) => (
+          <button
+            key={id}
+            type="button"
+            id={`media-tab-${id}`}
+            role="tab"
+            aria-selected={activeTab === id}
+            aria-controls="media-panel"
+            onClick={() => setActiveTab(id)}
+            className={`discover-tab ${activeTab === id ? 'is-active' : ''}`}
+          >
+            <Icon size={16} />
+            {label}
+            {count > 0 && <span className="text-xs text-gray-500">{count}</span>}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'pictures' ? (
+        <div id="media-panel" role="tabpanel" aria-labelledby="media-tab-pictures" className="flex flex-col gap-5">
+          <Panel className="discover-toolbar">
+            <div>
+              <h2 className="discover-section-title">Pictures</h2>
+              <p className="discover-selection-count mt-1">{selectedPictureIds.size} selected</p>
+            </div>
+            <label className="discover-primary-button cursor-pointer">
+              <ImagePlus size={16} /> Add pictures
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="sr-only"
+                onChange={(event) => {
+                  addPictures(event.currentTarget.files);
+                  event.currentTarget.value = '';
+                }}
+              />
+            </label>
+          </Panel>
+
+          {pictures.length === 0 ? (
+            <Panel className="discover-empty flex min-h-64 flex-col items-center justify-center gap-3 text-center">
+              <ImageIcon size={32} />
+              <p>No pictures added</p>
+            </Panel>
+          ) : (
+            <div className="discover-gallery columns-1 sm:columns-2 xl:columns-3">
+              {pictures.map((picture) => {
+                const selected = selectedPictureIds.has(picture.id);
+                return (
+                  <Panel key={picture.id} className={`discover-asset-card ${selected ? 'is-selected' : ''}`}>
+                    <button
+                      type="button"
+                      aria-pressed={selected}
+                      aria-label={`${selected ? 'Deselect' : 'Select'} ${picture.name}`}
+                      onClick={() =>
+                        setSelectedPictureIds((current) => {
+                          const next = new Set(current);
+                          selected ? next.delete(picture.id) : next.add(picture.id);
+                          return next;
+                        })
+                      }
+                      className="discover-asset-preview focus-visible:outline focus-visible:outline-2 focus-visible:outline-neon-cyan"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={picture.url} alt={picture.name} />
+                      <span className={`discover-check-badge ${selected ? 'is-selected' : ''}`}>
+                        {selected && <Check size={15} />}
+                      </span>
+                    </button>
+                    <div className="discover-asset-meta">
+                      <span className="discover-asset-name" title={picture.name}>{picture.name}</span>
+                      <button
+                        type="button"
+                        aria-label={`Remove ${picture.name}`}
+                        title="Remove picture"
+                        onClick={() => removePicture(picture)}
+                        className="discover-icon-button"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </Panel>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      ) : (
+      <div id="media-panel" role="tabpanel" aria-labelledby="media-tab-youtube" className="flex flex-col gap-6">
+      <Panel>
         <div className="relative flex flex-col gap-4">
           <div className="flex gap-2">
             {NICHES.map((n) => {
@@ -125,16 +246,16 @@ export default function DiscoverPage() {
                   key={n.id}
                   type="button"
                   onClick={() => setNiche(n.id)}
-                  className="relative rounded-lg border px-4 py-2 text-sm font-medium transition-all"
+                  className={`discover-chip relative rounded-lg border px-4 py-2 text-sm font-medium transition-all ${active ? 'is-active' : ''}`}
                   style={
                     active
                       ? {
                           borderColor: `${n.accent}66`,
                           backgroundColor: `${n.accent}1a`,
                           color: n.accent,
-                          boxShadow: `0 0 20px ${n.accent}33`,
+                          boxShadow: 'none',
                         }
-                      : { borderColor: 'rgba(255,255,255,0.1)', color: '#9ca3af' }
+                      : { borderColor: '#e4e4ea', color: '#686873' }
                   }
                 >
                   {n.label}
@@ -150,13 +271,13 @@ export default function DiscoverPage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={`Search ${niche} keywords, e.g. "${EXAMPLE_QUERIES[niche][0]}"`}
-                className="w-full rounded-lg border border-white/10 bg-black/40 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-gray-500 transition-colors focus:border-neon-cyan/50 focus:outline-none focus:ring-1 focus:ring-neon-cyan/30"
+                className="discover-input w-full rounded-lg border py-2.5 pl-9 pr-3 text-sm placeholder:text-gray-500 transition-colors focus:outline-none focus:ring-1"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center justify-center gap-2 rounded-lg border border-neon-cyan/40 bg-neon-cyan/10 px-5 py-2.5 text-sm font-medium text-neon-cyan transition-colors hover:bg-neon-cyan/20 disabled:opacity-50"
+              className="discover-primary-button disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
               {loading ? 'Searching' : 'Search'}
@@ -169,7 +290,7 @@ export default function DiscoverPage() {
                 key={q}
                 type="button"
                 onClick={() => handleExampleClick(q)}
-                className="rounded-full border border-white/10 px-3 py-1 text-xs text-gray-400 transition-colors hover:border-neon-cyan/30 hover:text-neon-cyan"
+                className="discover-suggestion rounded-full border px-3 py-1 text-xs transition-colors"
               >
                 {q}
               </button>
@@ -177,7 +298,7 @@ export default function DiscoverPage() {
           </div>
 
           {error && (
-            <p className="flex items-center gap-1.5 text-sm text-neon-red">
+            <p className="discover-error flex items-center gap-1.5 text-sm">
               <AlertCircle size={14} /> {error}
             </p>
           )}
@@ -185,8 +306,8 @@ export default function DiscoverPage() {
       </Panel>
 
       {!result && !loading && (
-        <Panel className="flex flex-col items-center gap-2 text-center text-gray-500 py-16">
-          <Layers size={28} className="text-gray-600" />
+        <Panel className="discover-empty flex flex-col items-center gap-2 py-16 text-center">
+          <Layers size={28} />
           Search a niche keyword above, or tap an example, to see real trending content.
         </Panel>
       )}
@@ -226,15 +347,15 @@ export default function DiscoverPage() {
                 <StatTile
                   label="Peak Velocity"
                   value={velocityLabel(summary.peakVelocity) ?? '—'}
-                  icon={Flame}
+                  icon={TrendingUp}
                 />
                 <StatTile label="Avg Engagement" value={formatPercent(summary.avgEngagement)} icon={TrendingUp} />
               </div>
             )}
 
-            <Panel className="flex items-start gap-2 text-sm text-gray-400 border-neon-purple/20">
-              <Sparkles size={16} className="mt-0.5 shrink-0 text-neon-purple" />
-              <span>{result.baselineNote}</span>
+            <Panel className="flex items-start gap-2 text-sm text-gray-400 border-neon-blue/20">
+              <Info size={16} className="mt-0.5 shrink-0 text-neon-blue" />
+              <span>Ranked by views gained per day since publishing.</span>
             </Panel>
 
             {result.trendSignal && result.trendSignal.length > 0 && (
@@ -246,21 +367,21 @@ export default function DiscoverPage() {
                   <AreaChart data={result.trendSignal}>
                     <defs>
                       <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#8000ff" stopOpacity={0.4} />
-                        <stop offset="100%" stopColor="#8000ff" stopOpacity={0} />
+                        <stop offset="0%" stopColor="#55a8d0" stopOpacity={0.28} />
+                        <stop offset="100%" stopColor="#55a8d0" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="date" stroke="#6b7280" fontSize={11} minTickGap={30} />
-                    <YAxis stroke="#6b7280" fontSize={11} domain={[0, 100]} />
+                    <CartesianGrid stroke="#ecebf0" />
+                    <XAxis dataKey="date" stroke="#777681" fontSize={11} minTickGap={30} />
+                    <YAxis stroke="#777681" fontSize={11} domain={[0, 100]} />
                     <Tooltip
-                      contentStyle={{ background: '#0a0f19', border: '1px solid rgba(128,0,255,0.3)', borderRadius: 8 }}
-                      labelStyle={{ color: '#8000ff' }}
+                      contentStyle={{ background: '#fff', border: '1px solid #e8e8ed', borderRadius: 6, color: '#20202a' }}
+                      labelStyle={{ color: '#287fa8' }}
                     />
                     <Area
                       type="monotone"
                       dataKey="interest"
-                      stroke="#8000ff"
+                      stroke="#55a8d0"
                       strokeWidth={2}
                       fill="url(#trendFill)"
                     />
@@ -284,7 +405,7 @@ export default function DiscoverPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: i * 0.05 }}
                     >
-                      <Panel className="group flex flex-col gap-3 h-full transition-all hover:border-neon-cyan/30 hover:shadow-cyber-glow-lg hover:-translate-y-0.5">
+                      <Panel className="discover-video-card group flex h-full flex-col gap-3 transition-transform hover:-translate-y-0.5">
                         <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black/40">
                           {item.thumbnailUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -299,10 +420,26 @@ export default function DiscoverPage() {
                             </div>
                           )}
                           {velocity && (
-                            <span className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/70 backdrop-blur-sm border border-neon-orange/40 px-2 py-1 text-[11px] font-medium text-neon-orange">
-                              <Flame size={11} /> {velocity}
+                            <span className="discover-velocity absolute top-2 right-2 flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium">
+                              <TrendingUp size={11} /> {velocity}
                             </span>
                           )}
+                          <button
+                            type="button"
+                            aria-pressed={selectedVideoIds.has(item.id)}
+                            aria-label={`${selectedVideoIds.has(item.id) ? 'Deselect' : 'Select'} ${item.title}`}
+                            onClick={() =>
+                              setSelectedVideoIds((current) => {
+                                const next = new Set(current);
+                                current.has(item.id) ? next.delete(item.id) : next.add(item.id);
+                                return next;
+                              })
+                            }
+                            className={`discover-video-select absolute left-2 top-2 flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${selectedVideoIds.has(item.id) ? 'is-selected' : ''}`}
+                            title={selectedVideoIds.has(item.id) ? 'Deselect video' : 'Select video'}
+                          >
+                            {selectedVideoIds.has(item.id) ? <Check size={15} /> : <Film size={15} />}
+                          </button>
                         </div>
                         <div className="flex flex-col gap-1">
                           <span className="text-sm text-white line-clamp-2 leading-snug">{item.title}</span>
@@ -342,6 +479,8 @@ export default function DiscoverPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
+      )}
     </div>
   );
 }

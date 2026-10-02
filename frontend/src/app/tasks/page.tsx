@@ -49,8 +49,8 @@ export default function TasksPage() {
   return (
     <div className="flex flex-col gap-8 animate-fade-in">
       <header>
-        <h1 className="font-orbitron text-3xl text-neon-cyan text-shadow-glow">Task Protocol</h1>
-        <p className="text-gray-400 mt-1">Workflow tracking for your content and analytics tasks.</p>
+        <h1 className="font-orbitron text-3xl text-neon-cyan">Project</h1>
+        <p className="text-gray-400 mt-1">Work items for your content and analytics.</p>
       </header>
 
       <Panel>
@@ -60,7 +60,7 @@ export default function TasksPage() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addTask()}
             placeholder="Add a new task..."
-            className="flex-1 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-neon-cyan/50 focus:outline-none"
+            className="flex-1 rounded-md border border-white/10 bg-white px-3 py-2 text-sm text-gray-700 placeholder:text-gray-500 focus:border-neon-cyan/50 focus:outline-none"
           />
           <button
             onClick={addTask}

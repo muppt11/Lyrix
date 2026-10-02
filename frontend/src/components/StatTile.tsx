@@ -17,7 +17,7 @@ export function StatTile({ label, value, delta, positive, icon: Icon }: StatTile
         <span className="text-xs uppercase tracking-widest text-gray-400">{label}</span>
         {Icon && <Icon size={18} className="text-neon-cyan" />}
       </div>
-      <span className="font-orbitron text-2xl text-white text-shadow-glow">{value}</span>
+      <span className="font-orbitron text-2xl text-white">{value}</span>
       {delta && (
         <span className={cn('text-xs font-medium', positive ? 'text-neon-green' : 'text-neon-red')}>
           {delta}
