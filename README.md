@@ -1,4 +1,4 @@
-# LyraLytics — Cybernetic Analytics Platform 🚀
+# Lyrix — Cybernetic Analytics Platform 🚀
 
 A futuristic, sci-fi themed unified analytics platform built with Next.js 14, TypeScript, and Tailwind CSS.
 
