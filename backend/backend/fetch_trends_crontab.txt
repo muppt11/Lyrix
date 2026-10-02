@@ -1,0 +1,149 @@
+# Fetch Trends Script Cron Job Configuration
+# =========================================
+#
+# This file contains the cron job configuration to run the fetch_trends.py script
+# every 3 minutes to collect trending data from Google Trends, YouTube, and TikTok.
+#
+# To install this cron job:
+# 1. Copy the line below to your crontab: crontab -e
+# 2. Save and exit the editor
+# 3. Verify with: crontab -l
+#
+# To remove the cron job:
+# crontab -r (removes all jobs) or edit with crontab -e and delete the line
+#
+# =========================================
+
+# Run fetch_trends.py every 3 minutes
+# Format: minute hour day month day_of_week command
+*/3 * * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/fetch_trends.log 2>&1
+
+# =========================================
+# Alternative configurations:
+# =========================================
+
+# Run every 5 minutes (less frequent)
+# */5 * * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/fetch_trends.log 2>&1
+
+# Run every 10 minutes (even less frequent)
+# */10 * * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/fetch_trends.log 2>&1
+
+# Run every hour (hourly collection)
+# 0 * * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/fetch_trends.log 2>&1
+
+# Run at specific times (e.g., every 2 hours)
+# 0 */2 * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/fetch_trends.log 2>&1
+
+# =========================================
+# Environment-specific configurations:
+# =========================================
+
+# For development (with full output)
+# */3 * * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py
+
+# For production (with logging and error handling)
+# */3 * * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/fetch_trends.log 2>&1
+
+# With custom Python environment (if using virtualenv)
+# */3 * * * * cd /path/to/your/project && /path/to/venv/bin/python fetch_trends.py >> /path/to/your/project/logs/fetch_trends.log 2>&1
+
+# With environment variables
+# */3 * * * * cd /path/to/your/project && YOUTUBE_API_KEY=your_api_key_here /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/fetch_trends.log 2>&1
+
+# With multiple environment variables
+# */3 * * * * cd /path/to/your/project && YOUTUBE_API_KEY=your_youtube_key TIKTOK_API_KEY=your_tiktok_key /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/fetch_trends.log 2>&1
+
+# =========================================
+# Advanced configurations:
+# =========================================
+
+# Run with custom log file
+# */3 * * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/custom_trends.log 2>&1
+
+# Run with timestamp in log filename
+# */3 * * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/fetch_trends_$(date +\%Y\%m\%d).log 2>&1
+
+# Run with separate error and output logs
+# */3 * * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py > /path/to/your/project/logs/fetch_trends.log 2> /path/to/your/project/logs/fetch_trends_error.log
+
+# Run with log rotation (using logrotate)
+# */3 * * * * cd /path/to/your/project && /usr/bin/python3 fetch_trends.py >> /path/to/your/project/logs/fetch_trends.log 2>&1
+
+# =========================================
+# Monitoring and maintenance cron jobs:
+# =========================================
+
+# Check script health (every 15 minutes)
+# */15 * * * * cd /path/to/your/project && /usr/bin/python3 -c "import os; print('Script exists:', os.path.exists('fetch_trends.py')); print('Log exists:', os.path.exists('logs/fetch_trends.log'))" >> /path/to/your/project/logs/health_check.log 2>&1
+
+# Clean up old log files (daily at 2 AM)
+# 0 2 * * * cd /path/to/your/project && find logs/ -name "fetch_trends*.log" -mtime +7 -delete >> /path/to/your/project/logs/cleanup.log 2>&1
+
+# Backup log files (weekly on Sundays at 3 AM)
+# 0 3 * * 0 cd /path/to/your/project && tar -czf backups/logs_$(date +\%Y\%m\%d).tar.gz logs/ >> /path/to/your/project/logs/backup.log 2>&1
+
+# =========================================
+# Cron Schedule Format Explanation:
+# =========================================
+#
+# Field    Allowed Values    Special Characters
+# -----    --------------    ------------------
+# minute   0-59             * / , -
+# hour     0-23             * / , -
+# day      1-31             * / , - ?
+# month    1-12             * / , -
+# weekday  0-7 (0=Sunday)   * / , - ?
+#
+# Special Characters:
+# * = any value
+# / = step values (e.g., */3 = every 3rd value)
+# , = value list separator (e.g., 1,3,5)
+# - = range of values (e.g., 1-5)
+# ? = no specific value (used for day or weekday)
+#
+# Examples:
+# */3 * * * *     = Every 3 minutes
+# 0 */2 * * *     = Every 2 hours
+# 0 9 * * 1-5     = Weekdays at 9 AM
+# 0 0 1 * *       = First day of each month
+# 0 12 * * 0      = Sundays at noon
+#
+# =========================================
+# Troubleshooting:
+# =========================================
+#
+# If the cron job is not running:
+# 1. Check if cron service is running: sudo service cron status
+# 2. Check cron logs: tail -f /var/log/cron
+# 3. Verify cron job: crontab -l
+# 4. Check script permissions: chmod +x fetch_trends.py
+# 5. Test script manually: python3 fetch_trends.py
+# 6. Check log files: tail -f logs/fetch_trends.log
+#
+# Common issues:
+# - Path issues: Use absolute paths in cron jobs
+# - Permission issues: Ensure script is executable
+# - Environment issues: Set PATH and other environment variables
+# - API key issues: Ensure environment variables are set correctly
+# - Import issues: Ensure all required libraries are installed
+#
+# =========================================
+# Environment Variables Setup:
+# =========================================
+#
+# Before running the cron job, ensure these environment variables are set:
+#
+# 1. YouTube API Key (optional but recommended):
+#    export YOUTUBE_API_KEY="your_youtube_api_key_here"
+#
+# 2. TikTok API Key (if available):
+#    export TIKTOK_API_KEY="your_tiktok_api_key_here"
+#
+# 3. Python Path (if using virtual environment):
+#    export PATH="/path/to/venv/bin:$PATH"
+#
+# You can also set these in your .bashrc or .profile file:
+# echo 'export YOUTUBE_API_KEY="your_key_here"' >> ~/.bashrc
+# source ~/.bashrc
+#
+# ========================================= 

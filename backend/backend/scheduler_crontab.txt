@@ -1,0 +1,126 @@
+# Trending Scheduler Cron Job Configuration
+# =========================================
+#
+# This file contains the cron job configuration to run the trending scheduler
+# every 3 minutes to collect data from Google Trends, YouTube, and TikTok.
+#
+# To install this cron job:
+# 1. Copy the line below to your crontab: crontab -e
+# 2. Save and exit the editor
+# 3. Verify with: crontab -l
+#
+# To remove the cron job:
+# crontab -r (removes all jobs) or edit with crontab -e and delete the line
+#
+# =========================================
+
+# Run trending scheduler every 3 minutes
+# Format: minute hour day month day_of_week command
+*/3 * * * * cd /path/to/your/project && /usr/bin/python3 trending_scheduler.py >> /path/to/your/project/logs/scheduler.log 2>&1
+
+# =========================================
+# Alternative configurations:
+# =========================================
+
+# Run every 5 minutes (less frequent)
+# */5 * * * * cd /path/to/your/project && /usr/bin/python3 trending_scheduler.py >> /path/to/your/project/logs/scheduler.log 2>&1
+
+# Run every 10 minutes (even less frequent)
+# */10 * * * * cd /path/to/your/project && /usr/bin/python3 trending_scheduler.py >> /path/to/your/project/logs/scheduler.log 2>&1
+
+# Run every hour (hourly collection)
+# 0 * * * * cd /path/to/your/project && /usr/bin/python3 trending_scheduler.py >> /path/to/your/project/logs/scheduler.log 2>&1
+
+# Run at specific times (e.g., every 2 hours)
+# 0 */2 * * * cd /path/to/your/project && /usr/bin/python3 trending_scheduler.py >> /path/to/your/project/logs/scheduler.log 2>&1
+
+# =========================================
+# Environment-specific configurations:
+# =========================================
+
+# For development (with full output)
+# */3 * * * * cd /path/to/your/project && /usr/bin/python3 trending_scheduler.py
+
+# For production (with logging and error handling)
+# */3 * * * * cd /path/to/your/project && /usr/bin/python3 trending_scheduler.py >> /path/to/your/project/logs/scheduler.log 2>&1
+
+# With custom Python environment (if using virtualenv)
+# */3 * * * * cd /path/to/your/project && /path/to/venv/bin/python trending_scheduler.py >> /path/to/your/project/logs/scheduler.log 2>&1
+
+# With environment variables
+# */3 * * * * cd /path/to/your/project && YOUTUBE_API_KEY=your_api_key_here /usr/bin/python3 trending_scheduler.py >> /path/to/your/project/logs/scheduler.log 2>&1
+
+# With custom database path
+# */3 * * * * cd /path/to/your/project && DB_PATH=/custom/path/trending_data.db /usr/bin/python3 trending_scheduler.py >> /path/to/your/project/logs/scheduler.log 2>&1
+
+# =========================================
+# Multiple scheduler instances (advanced):
+# =========================================
+
+# Run Google Trends only (every 3 minutes)
+# */3 * * * * cd /path/to/your/project && /usr/bin/python3 google_trends_python.py >> /path/to/your/project/logs/google_trends.log 2>&1
+
+# Run full scheduler (every 5 minutes)
+# */5 * * * * cd /path/to/your/project && /usr/bin/python3 trending_scheduler.py >> /path/to/your/project/logs/scheduler.log 2>&1
+
+# Run data cleanup (daily at 2 AM)
+# 0 2 * * * cd /path/to/your/project && /usr/bin/python3 -c "from trending_scheduler import TrendingScheduler; s = TrendingScheduler(); s.cleanup_old_data(30); s.close()" >> /path/to/your/project/logs/cleanup.log 2>&1
+
+# =========================================
+# Monitoring and maintenance cron jobs:
+# =========================================
+
+# Check scheduler health (every 15 minutes)
+# */15 * * * * cd /path/to/your/project && /usr/bin/python3 -c "import sqlite3; conn = sqlite3.connect('trending_data.db'); cursor = conn.cursor(); cursor.execute('SELECT COUNT(*) FROM collection_logs WHERE collection_timestamp > datetime(\"now\", \"-1 hour\")'); count = cursor.fetchone()[0]; print(f'Hourly collections: {count}'); conn.close()" >> /path/to/your/project/logs/health_check.log 2>&1
+
+# Export data daily (at 6 AM)
+# 0 6 * * * cd /path/to/your/project && /usr/bin/python3 -c "from trending_scheduler import TrendingScheduler; s = TrendingScheduler(); s.export_recent_data(24); s.close()" >> /path/to/your/project/logs/export.log 2>&1
+
+# Backup database weekly (Sundays at 3 AM)
+# 0 3 * * 0 cd /path/to/your/project && cp trending_data.db backups/trending_data_$(date +\%Y\%m\%d).db >> /path/to/your/project/logs/backup.log 2>&1
+
+# =========================================
+# Cron Schedule Format Explanation:
+# =========================================
+#
+# Field    Allowed Values    Special Characters
+# -----    --------------    ------------------
+# minute   0-59             * / , -
+# hour     0-23             * / , -
+# day      1-31             * / , - ?
+# month    1-12             * / , -
+# weekday  0-7 (0=Sunday)   * / , - ?
+#
+# Special Characters:
+# * = any value
+# / = step values (e.g., */3 = every 3rd value)
+# , = value list separator (e.g., 1,3,5)
+# - = range of values (e.g., 1-5)
+# ? = no specific value (used for day or weekday)
+#
+# Examples:
+# */3 * * * *     = Every 3 minutes
+# 0 */2 * * *     = Every 2 hours
+# 0 9 * * 1-5     = Weekdays at 9 AM
+# 0 0 1 * *       = First day of each month
+# 0 12 * * 0      = Sundays at noon
+#
+# =========================================
+# Troubleshooting:
+# =========================================
+#
+# If the cron job is not running:
+# 1. Check if cron service is running: sudo service cron status
+# 2. Check cron logs: tail -f /var/log/cron
+# 3. Verify cron job: crontab -l
+# 4. Check script permissions: chmod +x trending_scheduler.py
+# 5. Test script manually: python3 trending_scheduler.py
+# 6. Check log files: tail -f logs/scheduler.log
+#
+# Common issues:
+# - Path issues: Use absolute paths in cron jobs
+# - Permission issues: Ensure script is executable
+# - Environment issues: Set PATH and other environment variables
+# - Database locks: Ensure only one instance runs at a time
+#
+# ========================================= 
