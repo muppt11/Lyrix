@@ -92,6 +92,16 @@ The Creator Platform page gives you one dashboard for analytics across multiple 
 
 > ⚠️ **About OnlyFans**: OnlyFans does not offer a public developer API. The OnlyFans tile in the Creator Platform module is included for layout/demo purposes only and cannot be connected to live data through an official integration.
 
+## Challenges
+
+**Every platform has a different API.** Instagram, YouTube, TikTok, and the rest all return data differently. I built a pluggable provider layer so each platform maps into one shared shape and the dashboard doesn't care where data came from.
+
+**Useful before you connect anything.** Asking for API keys up front kills a demo. Every page renders with realistic demo data by default, and real providers plug in later.
+
+**Platforms without public APIs.** Some platforms simply don't offer one. Those tiles are clearly marked as demo only instead of pretending to work.
+
+**Bringing in your own data.** I added staged public data ingestion and CSV import so data can be checked before it lands in the dashboard.
+
 ## 🎨 Design System
 
 ### Colors
