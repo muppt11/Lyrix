@@ -4,6 +4,8 @@ A futuristic, sci-fi themed unified analytics platform built with Next.js 14, Ty
 
 ![LyraLytics Platform](https://img.shields.io/badge/LyraLytics-Cybernetic%20Analytics%20Platform-00ffff?style=for-the-badge&logo=react&logoColor=black)
 
+**Live demo (demo data): https://muppt11.github.io/Lyrix/**
+
 ## 🌟 Features
 
 - **🎨 Futuristic Sci-Fi UI** — cyberpunk-inspired interface with glow, glass panels, and animated grids
